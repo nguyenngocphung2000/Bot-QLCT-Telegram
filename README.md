@@ -155,24 +155,25 @@ function sendMessage(chatId, text) {
 
 ## IV. Cài đặt Webhook
 
-1.Trong Apps Script, nhấn Deploy (Triển khai) > New Deployment.
-Chọn Web App:
+1.Trong **Apps Script**, nhấn **Deploy** (Triển khai) > **New Deployment.**
+Chọn **Web Application**:
 
-Description: Nhập mô tả (ví dụ: Telegram Bot).
+**Description**: Nhập mô tả (ví dụ: Telegram Bot).
  
-Execute as: Chọn Me.
+**Execute as**: Chọn **Me**. 
  
-Who has access: Chọn Anyone.
- 
-2.Nhấn Deploy để tạo URL WebApp (ví dụ:https://script.google.com/macros/s/xxxxxxxxxxxxxxx/exec). Sao chép URL này lại để dùng bước tiếp theo.
+**Who has access**: Chọn **Anyone**(Bắt buộc).
+
+*Xong cấp quyền vào tài khoản gmail của bạn*
+2.Nhấn **Deploy** để tạo URL WebApp (ví dụ:https://script.google.com/macros/s/xxxxxxxxxxxxxxx/exec). Sao chép URL này lại để dùng bước tiếp theo.
 
  
-3.Cài Webhook cho bot Telegram:
+3.Cài **Webhook** cho bot **Telegram:**
   
 Mở trình duyệt, truy cập:
                 https://api.telegram.org/botYOUR_TELEGRAM_BOT_TOKEN/setWebhook?url=WEB_APP_URL
 
-(Thay YOUR_TELEGRAM_BOT_TOKEN và WEB_APP_URL(URL vừa lưu khi nãy )bằng thông tin của bạn).
+(Thay **YOUR_TELEGRAM_BOT_TOKEN** và **WEB_APP_URL** *(URL vừa lưu khi nãy )* bằng thông tin của bạn).
 
   Nếu thành công, bạn sẽ nhận được thông báo:
  
@@ -199,6 +200,8 @@ Ví dụ:
 
 
 # Lưu ý
+
+*Quy ước: 1k = 1000VND, 1tr = 1000000VND*
 
 *Google Sheets không được xóa hoặc thay đổi ID.*
  
