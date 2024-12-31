@@ -206,12 +206,9 @@ Thêm giao dịch: Gửi tin nhắn với cú pháp:
  
 Ví dụ:
 
-[](https://github.com/nguyenngocphung2000/Bot-QLCT-Telegram/blob/main/Thu.PNG)
+![](https://github.com/nguyenngocphung2000/Bot-QLCT-Telegram/blob/main/Thu.PNG)       
 
-
-        
-
-[](https://github.com/nguyenngocphung2000/Bot-QLCT-Telegram/blob/main/Chi.PNG)
+![](https://github.com/nguyenngocphung2000/Bot-QLCT-Telegram/blob/main/Chi.PNG)
 
 
         
