@@ -9,7 +9,8 @@
  
   3.Đặt tên và username cho bot (username phải kết thúc bằng _bot).
  
-  4.Sau khi hoàn tất, BotFather gửi cho bạn Token API (ví dụ: 123456:ABC-DEF1234ghIkl-zyx57W2v1u123ew11).
+  4.Sau khi hoàn tất, BotFather gửi cho bạn Token API 
+  Ví dụ: 123456:ABC-DEF1234ghIkl-zyx57W2v1u123ew11.
  
 ###  → Lưu lại Token API để sử dụng trong Google Apps Script.
 
@@ -180,23 +181,28 @@ Mở trình duyệt, truy cập:
 ---
 
 ## V. Sử dụng bot
-	Thêm giao dịch: Gửi tin nhắn với cú pháp: <số tiền> <danh mục> <mô tả>.
+Thêm giao dịch: Gửi tin nhắn với cú pháp: 
+
+      <số tiền> <danh mục> <mô tả>.
  
-     Ví dụ: 500k chi ăn sáng.
+Ví dụ:
+        500k chi ăn sáng.
   ### Các lệnh khác:
-	•/start: Bắt đầu bot và xem hướng dẫn.
+  
+**/start**: Bắt đầu bot và xem hướng dẫn.
  
-	•/report: Báo cáo chi tiêu.
+**/report**: Báo cáo chi tiêu.
  
-	•/undo: Xóa giao dịch gần nhất.
+**/undo**: Xóa giao dịch gần nhất.
  
-	•/reset: Xóa toàn bộ dữ liệu trên Google Sheets.
+**/reset**: Xóa toàn bộ dữ liệu trên Google Sheets.
 
 
 # Lưu ý
-	Google Sheets không được xóa hoặc thay đổi ID.
+
+*Google Sheets không được xóa hoặc thay đổi ID.*
  
-	Tài khoản Gmail cần cấp quyền cho Google Sheets khi cài Webhook.
+*Tài khoản Gmail cần cấp quyền cho Google Sheets khi cài Webhook.*
  
-	Đảm bảo bot Telegram đã được kết nối đúng Webhook.
+*Đảm bảo bot Telegram đã được kết nối đúng Webhook.*
 
