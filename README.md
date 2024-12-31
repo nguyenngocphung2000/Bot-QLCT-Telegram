@@ -206,11 +206,12 @@ Thêm giao dịch: Gửi tin nhắn với cú pháp:
  
 Ví dụ:
 
+[](https://github.com/nguyenngocphung2000/Bot-QLCT-Telegram/blob/main/Thu.PNG)
 
-        500k chi ăn sáng.
         
 
-        10tr thu tiền lương t10.
+[](https://github.com/nguyenngocphung2000/Bot-QLCT-Telegram/blob/main/Chi.PNG)
+
         
   ### Các lệnh khác:
   
@@ -218,9 +219,16 @@ Ví dụ:
  
 **/report**: Báo cáo chi tiêu.
 
+![](https://github.com/nguyenngocphung2000/Bot-QLCT-Telegram/blob/main/Rp.PNG)
+
+
 **/report month <MM-YYYY> :** Báo cáo theo tháng.
 
+![](https://github.com/nguyenngocphung2000/Bot-QLCT-Telegram/blob/main/Rp_month.PNG)
+
 **/report week <DD-MM-YYYY> :** Báo cáo theo tuần có ngày đó
+
+ ![](https://github.com/nguyenngocphung2000/Bot-QLCT-Telegram/blob/main/Rp_week.PNG)
  
 **/undo**: Xóa giao dịch gần nhất.
  
