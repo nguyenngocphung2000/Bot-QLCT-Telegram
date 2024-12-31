@@ -162,9 +162,13 @@ Thêm giao dịch: Gửi tin nhắn với cú pháp:
       <số tiền> <danh mục> <mô tả>.
  
 Ví dụ:
+
+
         500k chi ăn sáng.
+        
 
         10tr thu tiền lương t10.
+        
   ### Các lệnh khác:
   
 **/start**: Bắt đầu bot và xem hướng dẫn.
