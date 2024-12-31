@@ -63,7 +63,10 @@ function doPost(e) {
   const text = message.text;
 
   if (text.startsWith("/start")) {
-    sendMessage(chatId, `Chào mừng!\nNhập: <số tiền> <thu/chi> <mô tả>.\nLệnh:\n/report: Tổng\n/report <MM/YYYY>: Báo cáo tháng\n/report <DD/MM/YYYY>: Báo cáo tuần\n/reset: Xóa dữ liệu\n/undo: Xóa giao dịch gần nhất.`);
+    sendMessage(
+      chatId,
+      `Chào mừng!\nNhập: <số tiền> <thu/chi> <mô tả>.\nLệnh:\n/report: Tổng\n/report mm/yy: Báo cáo tháng\n/report dd/mm/yy: Báo cáo tuần\n/reset: Xóa dữ liệu\n/undo: Xóa giao dịch gần nhất.`
+    );
   } else if (text.startsWith("/report")) handleReport(chatId, text);
   else if (text.startsWith("/reset")) resetSheet(chatId);
   else if (text.startsWith("/undo")) undoLast(chatId);
@@ -83,19 +86,15 @@ function handleTransaction(chatId, text) {
 }
 
 function handleReport(chatId, text) {
-  const dateParam = text.match(/\d{2}\/\d{4}/) || text.match(/\d{2}\/\d{2}\/\d{4}/);
-  if (!dateParam) {
-    generateReport(chatId, "all", null);
-    return;
-  }
-
-  const filter = dateParam[0].split("/").length === 2 ? "month" : "week";
-  generateReport(chatId, filter, dateParam[0]);
+  const filter = text.includes("/") ? (text.match(/\d{2}\/\d{4}/) ? "month" : "week") : "all";
+  const dateParam = text.match(/\d{2}\/\d{4}|\d{2}\/\d{2}\/\d{4}/)?.[0] || null;
+  generateReport(chatId, filter, dateParam);
 }
 
 function generateReport(chatId, filter, dateParam) {
   const sheet = SpreadsheetApp.openById(SHEET_ID).getActiveSheet();
   const data = sheet.getDataRange().getValues().slice(1);
+
   if (!data.length) {
     sendMessage(chatId, "Không có dữ liệu.");
     return;
@@ -103,11 +102,6 @@ function generateReport(chatId, filter, dateParam) {
 
   const now = parseDate(filter, dateParam);
   const filteredData = data.filter(([date]) => isValidDate(new Date(date), filter, now));
-
-  if (!filteredData.length) {
-    sendMessage(chatId, "Không có giao dịch nào trong khoảng thời gian được yêu cầu.");
-    return;
-  }
 
   const incomeTransactions = [];
   const expenseTransactions = [];
@@ -125,6 +119,11 @@ function generateReport(chatId, filter, dateParam) {
       expenseTransactions.push(`- ${transaction}`);
     }
   });
+
+  if (!filteredData.length) {
+    sendMessage(chatId, `Không có giao dịch cho ${filter === "week" ? "tuần" : "tháng"} được yêu cầu.`);
+    return;
+  }
 
   const report = [
     `Báo cáo (${filter === "all" ? "tổng" : filter}):`,
@@ -165,16 +164,20 @@ function isValidDate(date, filter, now) {
     return date.getMonth() === now.getMonth() && date.getFullYear() === now.getFullYear();
   }
   if (filter === "week") {
+    const dayOfWeek = now.getDay();
+    const adjustment = dayOfWeek === 0 ? -6 : 1 - dayOfWeek;
     const startOfWeek = new Date(now);
-    startOfWeek.setDate(now.getDate() - now.getDay());
+    startOfWeek.setDate(now.getDate() + adjustment);
     const endOfWeek = new Date(startOfWeek);
     endOfWeek.setDate(startOfWeek.getDate() + 6);
+
     return date >= startOfWeek && date <= endOfWeek;
   }
   return true;
 }
 
 function parseDate(filter, dateParam) {
+  if (!dateParam) return new Date();
   const parts = dateParam.split("/");
   if (filter === "month") return new Date(parts[1], parts[0] - 1);
   if (filter === "week") return new Date(parts[2], parts[1] - 1, parts[0]);
