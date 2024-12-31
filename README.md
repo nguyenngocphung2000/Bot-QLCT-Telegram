@@ -22,60 +22,84 @@
  
   2.Trong Google Sheets, vào menu Extensions (Tiện ích mở rộng) > Apps Script.
  
-  3.Xóa toàn bộ nội dung mặc định và dán mã code:
+
+ 3.Chuẩn bị Token mà bạn tạo bot khi nãy được cấp, id file google sheet của bạn 
+
+ 4.Xóa toàn bộ nội dung mặc định và dán mã code ***(nhớ đổi token bot và id file google sheet)*** :
 
   
   ```
-  
-  const TELEGRAM_TOKEN = "YOUR_TELEGRAM_BOT_TOKEN";
+const TELEGRAM_TOKEN = "TOKEN BOT TELEGRAM CỦA BẠN";
 const TELEGRAM_API_URL = `https://api.telegram.org/bot${TELEGRAM_TOKEN}`;
-const SPREADSHEET_ID = "YOUR_SPREADSHEET_ID";
+const SPREADSHEET_ID = "ID FILE GOOGLE SHEET CỦA BẠN";
 
 function doPost(e) {
   const contents = JSON.parse(e.postData.contents);
-  if (contents.message) {
-    const chatId = contents.message.chat.id;
-    const text = contents.message.text;
+  const chatId = contents.message.chat.id;
+  const text = contents.message.text;
 
-    if (text.startsWith("/start")) {
-      sendMessage(
-        chatId,
-        "Chào mừng bạn đến với bot quản lý chi tiêu!\n" +
-          "Hãy nhập thông tin theo cú pháp: <số tiền> <thu/chi> <mô tả>.\n" +
-          "Ví dụ: 500k chi ăn sáng.\n" +
-          "Hoặc dùng các lệnh sau:\n" +
-          "/report: Báo cáo tổng thu và chi.\n" +
-          "/reset: Xóa toàn bộ dữ liệu.\n" +
-          "/undo: Xóa giao dịch gần nhất."
-      );
-    } else if (text.startsWith("/report")) {
-      generateReport(chatId);
-    } else if (text.startsWith("/reset")) {
-      resetReport(chatId);
-    } else if (text.startsWith("/undo")) {
-      undoLastTransaction(chatId);
-    } else {
-      const params = text.split(" ");
-      if (params.length < 2) {
-        sendMessage(chatId, "Lỗi: Nhập đúng cú pháp: <số tiền> <thu/chi> <mô tả>.\nVí dụ: 500k chi ăn sáng.");
-      } else {
-        const amount = params[0];
-        const type = params[1].toLowerCase();
-        const description = params.slice(2).join(" ") || "Không có mô tả";
-        const date = new Date().toLocaleString();
+  if (text.startsWith("/start")) {
+    sendMessage(
+      chatId,
+      "Chào mừng bạn!\nNhập: <số tiền> <thu/chi> <mô tả>.\nLệnh:\n/report: Báo cáo thu chi\n/reset: Xóa dữ liệu\n/undo: Xóa giao dịch gần nhất."
+    );
+  } else if (text.startsWith("/report")) generateReport(chatId);
+  else if (text.startsWith("/reset")) resetReport(chatId);
+  else if (text.startsWith("/undo")) undoLastTransaction(chatId);
+  else handleTransaction(chatId, text);
+}
 
-        if (!isValidAmount(amount)) {
-          sendMessage(chatId, "Lỗi: Số tiền không hợp lệ. Hãy nhập lại!");
-        } else if (type !== "thu" && type !== "chi") {
-          sendMessage(chatId, "Lỗi: Loại giao dịch phải là 'thu' hoặc 'chi'.");
-        } else {
-          const sheet = SpreadsheetApp.openById(SPREADSHEET_ID).getActiveSheet();
-          sheet.appendRow([date, type, amount, description]);
-          sendMessage(chatId, `Đã thêm giao dịch:\n- Số tiền: ${amount}\n- Loại: ${type}\n- Mô tả: ${description}`);
-        }
-      }
-    }
+function handleTransaction(chatId, text) {
+  const [amount, type, ...desc] = text.split(" ");
+  if (!isValidAmount(amount) || !["thu", "chi"].includes(type)) {
+    sendMessage(chatId, "Lỗi: Nhập đúng cú pháp: <số tiền> <thu/chi> <mô tả>.");
+    return;
   }
+  const description = desc.join(" ") || "Không có mô tả";
+  const sheet = SpreadsheetApp.openById(SPREADSHEET_ID).getActiveSheet();
+  sheet.appendRow([new Date().toLocaleString(), type, amount, description]);
+  sendMessage(chatId, `Đã thêm giao dịch:\nSố tiền: ${amount}\nLoại: ${type}\nMô tả: ${description}`);
+}
+
+function generateReport(chatId) {
+  const sheet = SpreadsheetApp.openById(SPREADSHEET_ID).getActiveSheet();
+  const data = sheet.getDataRange().getValues();
+  
+  if (data.length <= 1) {
+    sendMessage(chatId, "Không có dữ liệu để báo cáo.");
+    return;
+  }
+
+  let totalIncome = 0, totalExpense = 0;
+
+  data.slice(1).forEach(row => {
+    const type = row[1];
+    const amount = parseAmount(row[2]);
+    if (type === "thu") totalIncome += amount;
+    if (type === "chi") totalExpense += amount;
+  });
+
+  const balance = totalIncome - totalExpense;
+  sendMessage(
+    chatId,
+    `Báo cáo thu chi:\nTổng thu: ${formatCurrency(totalIncome)}\nTổng chi: ${formatCurrency(totalExpense)}\nCân đối: ${formatCurrency(balance)}`
+  );
+}
+
+function resetReport(chatId) {
+  const sheet = SpreadsheetApp.openById(SPREADSHEET_ID).getActiveSheet();
+  sheet.clear();
+  sheet.appendRow(["Thời gian", "Loại", "Số tiền", "Mô tả"]); // Thêm tiêu đề
+  sendMessage(chatId, "Đã xóa toàn bộ dữ liệu và đặt lại tiêu đề.");
+}
+
+function undoLastTransaction(chatId) {
+  const sheet = SpreadsheetApp.openById(SPREADSHEET_ID).getActiveSheet();
+  const lastRow = sheet.getLastRow();
+  if (lastRow > 1) {
+    sheet.deleteRow(lastRow);
+    sendMessage(chatId, "Đã xóa giao dịch gần nhất.");
+  } else sendMessage(chatId, "Không có giao dịch nào để xóa.");
 }
 
 function isValidAmount(amount) {
@@ -83,71 +107,21 @@ function isValidAmount(amount) {
 }
 
 function parseAmount(amount) {
-  if (amount.includes("tr")) {
-    return parseFloat(amount.replace("tr", "")) * 1000000;
-  } else if (amount.includes("k")) {
-    return parseFloat(amount.replace("k", "")) * 1000;
-  }
+  if (amount.includes("tr")) return parseFloat(amount.replace("tr", "")) * 1e6;
+  if (amount.includes("k")) return parseFloat(amount.replace("k", "")) * 1e3;
   return parseFloat(amount) || 0;
-}
-
-function generateReport(chatId) {
-  const sheet = SpreadsheetApp.openById(SPREADSHEET_ID).getActiveSheet();
-  const data = sheet.getDataRange().getValues();
-
-  let totalIncome = 0;
-  let totalExpense = 0;
-
-  for (let i = 0; i < data.length; i++) {
-    const row = data[i];
-    const type = row[1]?.toLowerCase();
-    const amount = parseAmount(row[2]);
-
-    if (type === "thu") {
-      totalIncome += amount;
-    } else if (type === "chi") {
-      totalExpense += amount;
-    }
-  }
-
-  sendMessage(
-    chatId,
-    `Báo cáo:\n- Tổng thu: ${formatCurrency(totalIncome)}\n- Tổng chi: ${formatCurrency(totalExpense)}\n- Cân đối: ${formatCurrency(totalIncome - totalExpense)}`
-  );
 }
 
 function formatCurrency(amount) {
   return new Intl.NumberFormat("vi-VN", { style: "currency", currency: "VND" }).format(amount);
 }
 
-function resetReport(chatId) {
-  const sheet = SpreadsheetApp.openById(SPREADSHEET_ID).getActiveSheet();
-  sheet.clear();
-  sendMessage(chatId, "Đã xóa toàn bộ dữ liệu.");
-}
-
-function undoLastTransaction(chatId) {
-  const sheet = SpreadsheetApp.openById(SPREADSHEET_ID).getActiveSheet();
-  const data = sheet.getDataRange().getValues();
-
-  if (data.length > 0) {
-    sheet.deleteRow(data.length);
-    sendMessage(chatId, "Đã xóa giao dịch gần nhất.");
-  } else {
-    sendMessage(chatId, "Không có giao dịch nào để xóa.");
-  }
-}
-
 function sendMessage(chatId, text) {
-  const payload = {
-    chat_id: chatId,
-    text: text,
-  };
-  const options = {
+  UrlFetchApp.fetch(`${TELEGRAM_API_URL}/sendMessage`, {
     method: "post",
     contentType: "application/json",
-    payload: JSON.stringify(payload),
-  };  UrlFetchApp.fetch(`${TELEGRAM_API_URL}/sendMessage`, options);
+    payload: JSON.stringify({ chat_id: chatId, text }),
+  });
 }
 ```
 
