@@ -5,25 +5,25 @@
 ## I. Tạo bot Telegram
   1.Mở Telegram và tìm BotFather.
  
-  2.Gửi lệnh /newbot để tạo bot mới.
+  2.Gửi lệnh **/newbot** để tạo bot mới.
  
   3.Đặt tên và username cho bot (username phải kết thúc bằng _bot).
  
   4.Sau khi hoàn tất, BotFather gửi cho bạn Token API 
   Ví dụ: 123456:ABC-DEF1234ghIkl-zyx57W2v1u123ew11.
  
-###  → Lưu lại Token API để sử dụng trong Google Apps Script.
+  ***Lưu lại Token API để sử dụng trong Google Apps Script*** .
 
 ---
 
 ## II. Tạo Google Sheets và viết Google Apps Script
 
-  1.Tạo một bảng Google Sheets mới, đặt tên (ví dụ: QuanLyChiTieu). 
+  1.Tạo một bảng **Google Sheets** mới, đặt tên (ví dụ: QuanLyChiTieu). 
  
-  2.Trong Google Sheets, vào menu Extensions (Tiện ích mở rộng) > Apps Script.
+  2.Trong Google Sheets, vào menu **Extensions** (Tiện ích mở rộng) > **Apps Script**.
  
 
- 3.Chuẩn bị Token mà bạn tạo bot khi nãy được cấp, id file google sheet của bạn 
+ 3.Chuẩn bị **Token mà bạn tạo bot khi nãy được cấp** và **id file google sheet** *(sau ký tự d/ và trước ký tự /edit tại đường dẫn đến file)*
 
  4.Xóa toàn bộ nội dung mặc định và dán mã code ***(nhớ đổi token bot và id file google sheet)*** :
 
@@ -163,6 +163,8 @@ Thêm giao dịch: Gửi tin nhắn với cú pháp:
  
 Ví dụ:
         500k chi ăn sáng.
+
+        10tr thu tiền lương t10.
   ### Các lệnh khác:
   
 **/start**: Bắt đầu bot và xem hướng dẫn.
@@ -178,6 +180,8 @@ Ví dụ:
 # Lưu ý
 
 *Quy ước: 1k = 1000VND, 1tr = 1000000VND*
+
+*Không nhập 5tr2 hoặc lẻ, nếu lẻ thì nhập 5200k*
 
 *Google Sheets không được xóa hoặc thay đổi ID.*
  
