@@ -165,6 +165,7 @@ Chọn **Web Application**:
 **Who has access**: Chọn **Anyone**(Bắt buộc).
 
 *Xong cấp quyền vào tài khoản gmail của bạn*
+
 2.Nhấn **Deploy** để tạo URL WebApp (ví dụ:https://script.google.com/macros/s/xxxxxxxxxxxxxxx/exec). Sao chép URL này lại để dùng bước tiếp theo.
 
  
@@ -198,6 +199,7 @@ Ví dụ:
  
 **/reset**: Xóa toàn bộ dữ liệu trên Google Sheets.
 
+***
 
 # Lưu ý
 
