@@ -1,5 +1,7 @@
 # Hướng dẫn tạo bot quản lý chi tiêu với Telegram và Google Sheets
 
+---
+
 ## I. Tạo bot Telegram
   1.Mở Telegram và tìm BotFather.
  
@@ -11,6 +13,7 @@
  
 ###  → Lưu lại Token API để sử dụng trong Google Apps Script.
 
+---
 
 ## II. Tạo Google Sheets và viết Google Apps Script
 
@@ -22,6 +25,8 @@
 
   
   '''
+
+  
   const TELEGRAM_TOKEN = "YOUR_TELEGRAM_BOT_TOKEN";
 const TELEGRAM_API_URL = `https://api.telegram.org/bot${TELEGRAM_TOKEN}`;
 const SPREADSHEET_ID = "YOUR_SPREADSHEET_ID";
@@ -144,7 +149,10 @@ function sendMessage(chatId, text) {
     payload: JSON.stringify(payload),
   };  UrlFetchApp.fetch(`${TELEGRAM_API_URL}/sendMessage`, options);
 }
+
 '''
+
+---
 
 ## IV. Cài đặt Webhook
 
@@ -171,6 +179,8 @@ Chọn Web App:
   Nếu thành công, bạn sẽ nhận được thông báo:
  
 {"ok":true,"result":true,"description":"Webhook was set"}.
+
+---
 
 ## V. Sử dụng bot
 	Thêm giao dịch: Gửi tin nhắn với cú pháp: <số tiền> <danh mục> <mô tả>.
