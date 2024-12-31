@@ -49,13 +49,13 @@ Bot ghi lại mọi giao dịch vào Google Sheets, giúp lưu trữ dữ liệu
 
  3.Chuẩn bị **Token mà bạn tạo bot khi nãy được cấp** và **id file google sheet** *(sau ký tự d/ và trước ký tự /edit tại đường dẫn đến file)*
 
- 4.Xóa toàn bộ nội dung mặc định và dán mã code ***(nhớ đổi token bot và id file google sheet)*** :
+ 4.Xóa toàn bộ nội dung mặc định và dán mã code ***(nhớ đổi token bot và id file google sheet ở dòng đầu tiên và dòng thứ 3)*** :
 
  
 ```
-const TOKEN = "TOKEN BOT TELEGRAM CỦA BẠN";
+const TOKEN = "YOUR_TELEGRAM_BOT_TOKEN";
 const API_URL = `https://api.telegram.org/bot${TOKEN}`;
-const SHEET_ID = "ID FILE SHEET CỦA BẠN";
+const SHEET_ID = "YOUR_SHEET_ID";
 
 function doPost(e) {
   const { message } = JSON.parse(e.postData.contents);
@@ -65,29 +65,45 @@ function doPost(e) {
   if (text.startsWith("/start")) {
     sendMessage(
       chatId,
-      `Chào mừng!\nNhập: <số tiền> <thu/chi> <mô tả>.\nLệnh:\n/report: Tổng\n/report mm/yy: Báo cáo tháng\n/report dd/mm/yy: Báo cáo tuần\n/reset: Xóa dữ liệu\n/undo: Xóa giao dịch gần nhất.`
+      `Chào mừng!\nNhập: <số tiền> <thu/chi> <mô tả>.\nLệnh:\n/report: Báo cáo tổng\n/report mm/yyyy: Báo cáo tháng\n/report dd/mm/yyyy: Báo cáo tuần\n/reset: Xóa dữ liệu\n/undo: Xóa giao dịch gần nhất.`
     );
-  } else if (text.startsWith("/report")) handleReport(chatId, text);
-  else if (text.startsWith("/reset")) resetSheet(chatId);
-  else if (text.startsWith("/undo")) undoLast(chatId);
-  else handleTransaction(chatId, text);
+  } else if (text.startsWith("/report")) {
+    handleReport(chatId, text);
+  } else if (text.startsWith("/reset")) {
+    resetSheet(chatId);
+  } else if (text.startsWith("/undo")) {
+    undoLast(chatId);
+  } else {
+    handleTransaction(chatId, text);
+  }
 }
 
 function handleTransaction(chatId, text) {
   const [amount, type, ...desc] = text.split(" ");
-  if (!isValidAmount(amount) || !["thu", "chi"].includes(type)) {
+  if (!isValidAmount(amount) || !["thu", "chi"].includes(type.toLowerCase())) {
     sendMessage(chatId, "Lỗi: Nhập đúng cú pháp <số tiền> <thu/chi> <mô tả>.");
     return;
   }
 
   const sheet = SpreadsheetApp.openById(SHEET_ID).getActiveSheet();
-  sheet.appendRow([new Date(), type, parseAmount(amount), desc.join(" ") || "Không có mô tả"]);
+  sheet.appendRow([
+    new Date(),
+    type.toLowerCase(),
+    parseAmount(amount),
+    desc.join(" ") || "Không có mô tả",
+  ]);
   sendMessage(chatId, `Đã thêm giao dịch:\nSố tiền: ${amount}\nLoại: ${type}\nMô tả: ${desc.join(" ")}`);
 }
 
 function handleReport(chatId, text) {
-  const filter = text.includes("/") ? (text.match(/\d{2}\/\d{4}/) ? "month" : "week") : "all";
-  const dateParam = text.match(/\d{2}\/\d{4}|\d{2}\/\d{2}\/\d{4}/)?.[0] || null;
+  const dateRegex = /\d{2}\/\d{4}|\d{2}\/\d{2}\/\d{4}/;
+  const dateParam = text.match(dateRegex)?.[0];
+  let filter = "all";
+
+  if (dateParam) {
+    filter = dateParam.length === 7 ? "month" : "week";
+  }
+
   generateReport(chatId, filter, dateParam);
 }
 
@@ -101,7 +117,9 @@ function generateReport(chatId, filter, dateParam) {
   }
 
   const now = parseDate(filter, dateParam);
-  const filteredData = data.filter(([date]) => isValidDate(new Date(date), filter, now));
+  const filteredData = data.filter(([date]) =>
+    isValidDate(new Date(date), filter, now)
+  );
 
   const incomeTransactions = [];
   const expenseTransactions = [];
@@ -121,7 +139,8 @@ function generateReport(chatId, filter, dateParam) {
   });
 
   if (!filteredData.length) {
-    sendMessage(chatId, `Không có giao dịch cho ${filter === "week" ? "tuần" : "tháng"} được yêu cầu.`);
+    const range = filter === "week" ? "tuần" : "tháng";
+    sendMessage(chatId, `Không có giao dịch cho ${range} được yêu cầu.`);
     return;
   }
 
@@ -161,15 +180,17 @@ function undoLast(chatId) {
 
 function isValidDate(date, filter, now) {
   if (filter === "month") {
-    return date.getMonth() === now.getMonth() && date.getFullYear() === now.getFullYear();
+    return (
+      date.getMonth() === now.getMonth() &&
+      date.getFullYear() === now.getFullYear()
+    );
   }
   if (filter === "week") {
-    const dayOfWeek = now.getDay();
-    const adjustment = dayOfWeek === 0 ? -6 : 1 - dayOfWeek;
+    const dayOfWeek = now.getDay() || 7; // Chủ nhật là 7
     const startOfWeek = new Date(now);
-    startOfWeek.setDate(now.getDate() + adjustment);
+    startOfWeek.setDate(now.getDate() - dayOfWeek + 1); // Ngày đầu tuần
     const endOfWeek = new Date(startOfWeek);
-    endOfWeek.setDate(startOfWeek.getDate() + 6);
+    endOfWeek.setDate(startOfWeek.getDate() + 6); // Ngày cuối tuần
 
     return date >= startOfWeek && date <= endOfWeek;
   }
@@ -179,8 +200,13 @@ function isValidDate(date, filter, now) {
 function parseDate(filter, dateParam) {
   if (!dateParam) return new Date();
   const parts = dateParam.split("/");
-  if (filter === "month") return new Date(parts[1], parts[0] - 1);
-  if (filter === "week") return new Date(parts[2], parts[1] - 1, parts[0]);
+  if (filter === "month" && parts.length === 2) {
+    return new Date(parts[1], parts[0] - 1);
+  }
+  if (filter === "week" && parts.length === 3) {
+    return new Date(parts[2], parts[1] - 1, parts[0]);
+  }
+  return new Date();
 }
 
 function isValidAmount(amount) {
