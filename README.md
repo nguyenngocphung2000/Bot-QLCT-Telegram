@@ -28,7 +28,8 @@
  4.Xóa toàn bộ nội dung mặc định và dán mã code ***(nhớ đổi token bot và id file google sheet)*** :
 
   
-  ```const TOKEN = "TOKEN BOT TELEGRAM CỦA BẠN";
+  ```
+const TOKEN = "TOKEN BOT TELEGRAM CỦA BẠN";
 const API_URL = `https://api.telegram.org/bot${TOKEN}`;
 const SHEET_ID = "ID FILE SHEET CỦA BẠN";
 
@@ -217,9 +218,9 @@ Ví dụ:
  
 **/report**: Báo cáo chi tiêu.
 
-**/report month <MM-YYYY>** Báo cáo theo tháng.
+**/report month <MM-YYYY> :** Báo cáo theo tháng.
 
-**/report week <DD-MM-YYYY>** Báo cáo theo tuần có ngày đó
+**/report week <DD-MM-YYYY> :** Báo cáo theo tuần có ngày đó
  
 **/undo**: Xóa giao dịch gần nhất.
  
