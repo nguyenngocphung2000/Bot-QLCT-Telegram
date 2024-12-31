@@ -2,6 +2,34 @@
 
 ---
 
+## Mục tiêu của bot
+
+   Bot không chỉ là một công cụ giúp ghi chép mà còn hướng đến việc xây dựng thói quen tài chính tốt hơn cho người dùng. Với tính năng báo cáo và phân tích, bot mang lại sự minh bạch và kiểm soát chặt chẽ, giúp người dùng quản lý chi tiêu thông minh hơn và đạt được mục tiêu tài chính cá nhân.
+   
+***
+
+## Tác dụng của bot
+
+  *Bot được thiết kế như một công cụ quản lý tài chính cá nhân đơn giản nhưng hiệu quả. Nó giúp người dùng ghi lại, theo dõi, và báo cáo các giao dịch thu nhập và chi tiêu trong cuộc sống hàng ngày. Dưới đây là một số lợi ích chính*
+
+# 1.
+Quản lý tài chính cá nhân:
+Người dùng có thể ghi chép các khoản thu nhập và chi tiêu một cách nhanh chóng, dễ dàng qua Telegram.
+
+# 2.
+Theo dõi chi tiết giao dịch:
+Bot cung cấp báo cáo chi tiết về các giao dịch trong một khoảng thời gian cụ thể, giúp người dùng có cái nhìn tổng quan về tình hình tài chính.
+
+# 3.
+Hỗ trợ phân tích tài chính:
+Với các báo cáo cân đối giữa thu và chi, người dùng có thể xác định các vấn đề như chi tiêu quá mức hoặc nguồn thu nhập chính yếu của mình.
+
+# 4.
+Tăng tính minh bạch và tổ chức:
+Bot ghi lại mọi giao dịch vào Google Sheets, giúp lưu trữ dữ liệu an toàn và dễ dàng truy cập để xem lại.
+
+---
+
 ## I. Tạo bot Telegram
   1.Mở Telegram và tìm BotFather.
  
@@ -221,11 +249,11 @@ Ví dụ:
 ![](https://github.com/nguyenngocphung2000/Bot-QLCT-Telegram/blob/main/Rp.PNG)
 
 
-**/report month <MM-YYYY> :** Báo cáo theo tháng.
+**/report month MM-YYYY :** Báo cáo theo tháng.
 
 ![](https://github.com/nguyenngocphung2000/Bot-QLCT-Telegram/blob/main/Rp_month.PNG)
 
-**/report week <DD-MM-YYYY> :** Báo cáo theo tuần có ngày đó
+**/report week DD-MM-YYYY :** Báo cáo theo tuần có ngày đó
 
  ![](https://github.com/nguyenngocphung2000/Bot-QLCT-Telegram/blob/main/Rp_week.PNG)
  
