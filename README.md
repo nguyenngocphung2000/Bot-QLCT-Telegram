@@ -19,8 +19,9 @@
   2.Trong Google Sheets, vào menu Extensions (Tiện ích mở rộng) > Apps Script.
  
   3.Xóa toàn bộ nội dung mặc định và dán mã code:
-  '''javascript
+
   
+  '''
   const TELEGRAM_TOKEN = "YOUR_TELEGRAM_BOT_TOKEN";
 const TELEGRAM_API_URL = `https://api.telegram.org/bot${TELEGRAM_TOKEN}`;
 const SPREADSHEET_ID = "YOUR_SPREADSHEET_ID";
