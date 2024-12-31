@@ -24,8 +24,7 @@
   3.Xóa toàn bộ nội dung mặc định và dán mã code:
 
   
-  '''
-
+  ```
   
   const TELEGRAM_TOKEN = "YOUR_TELEGRAM_BOT_TOKEN";
 const TELEGRAM_API_URL = `https://api.telegram.org/bot${TELEGRAM_TOKEN}`;
@@ -149,8 +148,7 @@ function sendMessage(chatId, text) {
     payload: JSON.stringify(payload),
   };  UrlFetchApp.fetch(`${TELEGRAM_API_URL}/sendMessage`, options);
 }
-
-'''
+```
 
 ---
 
@@ -169,10 +167,9 @@ Chọn Web App:
 
  
   3.Cài Webhook cho bot Telegram:
- 
-    Mở trình duyệt, truy cập:
- 
-   https://api.telegram.org/botYOUR_TELEGRAM_BOT_TOKEN/setWebhook?url=WEB_APP_URL
+  
+ Mở trình duyệt, truy cập:
+                https://api.telegram.org/botYOUR_TELEGRAM_BOT_TOKEN/setWebhook?url=WEB_APP_URL
 
 (Thay YOUR_TELEGRAM_BOT_TOKEN và WEB_APP_URL(URL vừa lưu khi nãy )bằng thông tin của bạn).
 
