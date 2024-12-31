@@ -51,9 +51,8 @@ Bot ghi lại mọi giao dịch vào Google Sheets, giúp lưu trữ dữ liệu
 
  4.Xóa toàn bộ nội dung mặc định và dán mã code ***(nhớ đổi token bot và id file google sheet)*** :
 
-  
-  ```
-const TOKEN = "TOKEN BOT TELEGRAM CỦA BẠN";
+ 
+```const TOKEN = "TOKEN BOT TELEGRAM CỦA BẠN";
 const API_URL = `https://api.telegram.org/bot${TOKEN}`;
 const SHEET_ID = "ID FILE SHEET CỦA BẠN";
 
@@ -63,7 +62,7 @@ function doPost(e) {
   const text = message.text;
 
   if (text.startsWith("/start")) {
-    sendMessage(chatId, `Chào mừng!\nNhập: <số tiền> <thu/chi> <mô tả>.\nLệnh:\n/report: Tổng\n/report month <MM-YYYY>\n/report week <DD-MM-YYYY>\n/reset: Xóa dữ liệu\n/undo: Xóa giao dịch gần nhất.`);
+    sendMessage(chatId, `Chào mừng!\nNhập: <số tiền> <thu/chi> <mô tả>.\nLệnh:\n/report: Tổng\n/report <MM/YYYY>: Báo cáo tháng\n/report <DD/MM/YYYY>: Báo cáo tuần\n/reset: Xóa dữ liệu\n/undo: Xóa giao dịch gần nhất.`);
   } else if (text.startsWith("/report")) handleReport(chatId, text);
   else if (text.startsWith("/reset")) resetSheet(chatId);
   else if (text.startsWith("/undo")) undoLast(chatId);
@@ -83,14 +82,19 @@ function handleTransaction(chatId, text) {
 }
 
 function handleReport(chatId, text) {
-  const filter = text.includes("month") ? "month" : text.includes("week") ? "week" : "all";
-  const dateParam = text.match(/\d{2}-\d{4}|\d{2}-\d{2}-\d{4}/)?.[0] || null;
-  generateReport(chatId, filter, dateParam);
+  const dateParam = text.match(/\d{2}\/\d{4}/) || text.match(/\d{2}\/\d{2}\/\d{4}/);
+  if (!dateParam) {
+    generateReport(chatId, "all", null);
+    return;
+  }
+
+  const filter = dateParam[0].split("/").length === 2 ? "month" : "week";
+  generateReport(chatId, filter, dateParam[0]);
 }
 
 function generateReport(chatId, filter, dateParam) {
   const sheet = SpreadsheetApp.openById(SHEET_ID).getActiveSheet();
-  const data = sheet.getDataRange().getValues().slice(1); // Tải toàn bộ dữ liệu một lần
+  const data = sheet.getDataRange().getValues().slice(1);
   if (!data.length) {
     sendMessage(chatId, "Không có dữ liệu.");
     return;
@@ -98,7 +102,12 @@ function generateReport(chatId, filter, dateParam) {
 
   const now = parseDate(filter, dateParam);
   const filteredData = data.filter(([date]) => isValidDate(new Date(date), filter, now));
-  
+
+  if (!filteredData.length) {
+    sendMessage(chatId, "Không có giao dịch nào trong khoảng thời gian được yêu cầu.");
+    return;
+  }
+
   const incomeTransactions = [];
   const expenseTransactions = [];
   let [income, expense] = [0, 0];
@@ -135,7 +144,7 @@ function generateReport(chatId, filter, dateParam) {
 function resetSheet(chatId) {
   const sheet = SpreadsheetApp.openById(SHEET_ID).getActiveSheet();
   sheet.clear();
-  sheet.appendRow(["Thời gian", "Loại", "Số tiền", "Mô tả"]); // Thêm tiêu đề sau khi xóa
+  sheet.appendRow(["Thời gian", "Loại", "Số tiền", "Mô tả"]);
   sendMessage(chatId, "Đã xóa toàn bộ dữ liệu.");
 }
 
@@ -165,8 +174,7 @@ function isValidDate(date, filter, now) {
 }
 
 function parseDate(filter, dateParam) {
-  if (!dateParam) return new Date();
-  const parts = dateParam.split("-");
+  const parts = dateParam.split("/");
   if (filter === "month") return new Date(parts[1], parts[0] - 1);
   if (filter === "week") return new Date(parts[2], parts[1] - 1, parts[0]);
 }
@@ -245,11 +253,11 @@ Ví dụ:
 ![](https://github.com/nguyenngocphung2000/Bot-QLCT-Telegram/blob/main/Rp.PNG)
 
 
-**/report month MM-YYYY :** Báo cáo theo tháng.
+**/report mm/yyyy :** Báo cáo theo tháng.
 
 ![](https://github.com/nguyenngocphung2000/Bot-QLCT-Telegram/blob/main/Rp_month.PNG)
 
-**/report week DD-MM-YYYY :** Báo cáo theo tuần có ngày đó
+**/report dd/mm/yyyy :** Báo cáo theo tuần có ngày đó
 
  ![](https://github.com/nguyenngocphung2000/Bot-QLCT-Telegram/blob/main/Rp_week.PNG)
  
