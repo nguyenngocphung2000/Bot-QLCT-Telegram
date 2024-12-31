@@ -12,21 +12,21 @@
 
   *Bot được thiết kế như một công cụ quản lý tài chính cá nhân đơn giản nhưng hiệu quả. Nó giúp người dùng ghi lại, theo dõi, và báo cáo các giao dịch thu nhập và chi tiêu trong cuộc sống hàng ngày. Dưới đây là một số lợi ích chính*
 
-# 1.Quản lý tài chính cá nhân:
+### 1.Quản lý tài chính cá nhân:
 Người dùng có thể ghi chép các khoản thu nhập và chi tiêu một cách nhanh chóng, dễ dàng qua Telegram.
 
-# 2.Theo dõi chi tiết giao dịch:
+### 2.Theo dõi chi tiết giao dịch:
 Bot cung cấp báo cáo chi tiết về các giao dịch trong một khoảng thời gian cụ thể, giúp người dùng có cái nhìn tổng quan về tình hình tài chính.
 
-# 3.Hỗ trợ phân tích tài chính:
+### 3.Hỗ trợ phân tích tài chính:
 Với các báo cáo cân đối giữa thu và chi, người dùng có thể xác định các vấn đề như chi tiêu quá mức hoặc nguồn thu nhập chính yếu của mình.
 
-# 4.Tăng tính minh bạch và tổ chức:
+### 4.Tăng tính minh bạch và tổ chức:
 Bot ghi lại mọi giao dịch vào Google Sheets, giúp lưu trữ dữ liệu an toàn và dễ dàng truy cập để xem lại.
 
 ---
 
-## I. Tạo bot Telegram
+### I. Tạo bot Telegram
   1.Mở Telegram và tìm **BotFather.**
  
   2.Gửi lệnh **/newbot** để tạo bot mới.
@@ -259,7 +259,7 @@ Ví dụ:
 
 ***
 
-# Lưu ý
+## Lưu ý
 
 *Quy ước: 1k = 1000VND, 1tr = 1000000VND*
 
