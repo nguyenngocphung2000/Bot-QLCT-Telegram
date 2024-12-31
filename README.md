@@ -52,7 +52,8 @@ Bot ghi lại mọi giao dịch vào Google Sheets, giúp lưu trữ dữ liệu
  4.Xóa toàn bộ nội dung mặc định và dán mã code ***(nhớ đổi token bot và id file google sheet)*** :
 
  
-```const TOKEN = "TOKEN BOT TELEGRAM CỦA BẠN";
+```
+const TOKEN = "TOKEN BOT TELEGRAM CỦA BẠN";
 const API_URL = `https://api.telegram.org/bot${TOKEN}`;
 const SHEET_ID = "ID FILE SHEET CỦA BẠN";
 
