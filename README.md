@@ -52,8 +52,7 @@ Bot ghi lại mọi giao dịch vào Google Sheets, giúp lưu trữ dữ liệu
  4.Xóa toàn bộ nội dung mặc định và dán mã code ***(nhớ đổi token bot và id file google sheet ở dòng đầu tiên và dòng thứ 3)*** :
 
  
-```
-const TOKEN = "YOUR_TELEGRAM_BOT_TOKEN";
+```const TOKEN = "YOUR_TELEGRAM_BOT_TOKEN";
 const API_URL = `https://api.telegram.org/bot${TOKEN}`;
 const SHEET_ID = "YOUR_SHEET_ID";
 
@@ -65,7 +64,7 @@ function doPost(e) {
   if (text.startsWith("/start")) {
     sendMessage(
       chatId,
-      `Chào mừng!\nNhập: <số tiền> <thu/chi> <mô tả>.\nLệnh:\n/report: Báo cáo tổng\n/report mm/yyyy: Báo cáo tháng\n/report dd/mm/yyyy: Báo cáo tuần\n/reset: Xóa dữ liệu\n/undo: Xóa giao dịch gần nhất.`
+      `Chào mừng bạn đến với ứng dụng quản lý tài chính cá nhân!\n\nHướng dẫn sử dụng:\n\n1. Thêm giao dịch:\n   Nhập theo cú pháp: <số tiền> <thu/chi> <mô tả>.\n\n2. Xem báo cáo:\n   - /report: Báo cáo tổng.\n   - /report mm/yyyy: Báo cáo tháng.\n   - /report dd/mm/yyyy: Báo cáo tuần (hiển thị tuần có ngày được chọn).\n   - Thêm "az" hoặc "za" sau lệnh để sắp xếp:\n     Ví dụ: /report az hoặc /report mm/yyyy za.\n\n3. Hủy giao dịch gần nhất:\n   - /undo: Xóa giao dịch gần nhất.\n\n4. Xóa toàn bộ dữ liệu:\n   - /reset: Xóa tất cả dữ liệu trên bảng tính.\n`
     );
   } else if (text.startsWith("/report")) {
     handleReport(chatId, text);
@@ -99,15 +98,22 @@ function handleReport(chatId, text) {
   const dateRegex = /\d{2}\/\d{4}|\d{2}\/\d{2}\/\d{4}/;
   const dateParam = text.match(dateRegex)?.[0];
   let filter = "all";
+  let sortOrder = null;
+
+  if (text.includes("az")) {
+    sortOrder = "az";
+  } else if (text.includes("za")) {
+    sortOrder = "za";
+  }
 
   if (dateParam) {
     filter = dateParam.length === 7 ? "month" : "week";
   }
 
-  generateReport(chatId, filter, dateParam);
+  generateReport(chatId, filter, dateParam, sortOrder);
 }
 
-function generateReport(chatId, filter, dateParam) {
+function generateReport(chatId, filter, dateParam, sortOrder) {
   const sheet = SpreadsheetApp.openById(SHEET_ID).getActiveSheet();
   const data = sheet.getDataRange().getValues().slice(1);
 
@@ -121,13 +127,29 @@ function generateReport(chatId, filter, dateParam) {
     isValidDate(new Date(date), filter, now)
   );
 
+  if (sortOrder) {
+    filteredData.sort((a, b) => {
+      const amountA = a[2];
+      const amountB = b[2];
+      return sortOrder === "az" ? amountA - amountB : amountB - amountA;
+    });
+  }
+
   const incomeTransactions = [];
   const expenseTransactions = [];
   let [income, expense] = [0, 0];
 
   filteredData.forEach(([date, type, amount, desc]) => {
-    const formattedDate = new Date(date).toLocaleDateString("vi-VN");
-    const transaction = `${formatCurrency(amount)}: ${desc || "Không có mô tả"} (${formattedDate})`;
+    const formattedReportDate = new Date(date).toLocaleString("vi-VN", {
+      hour: "2-digit",
+      minute: "2-digit",
+      day: "2-digit",
+      month: "2-digit",
+      year: "numeric",
+      hour12: false,
+    });
+
+    const transaction = `${formatCurrency(amount)}: ${desc || "Không có mô tả"} (${formattedReportDate})`;
 
     if (type === "thu") {
       income += amount;
@@ -144,8 +166,13 @@ function generateReport(chatId, filter, dateParam) {
     return;
   }
 
+  const weekInfo =
+    filter === "week"
+      ? ` (tuần từ ${now.startOfWeek.toLocaleDateString("vi-VN")} đến ${now.endOfWeek.toLocaleDateString("vi-VN")})`
+      : "";
+
   const report = [
-    `Báo cáo (${filter === "all" ? "tổng" : filter}):`,
+    `Báo cáo (${filter === "all" ? "tổng" : filter}${weekInfo}):`,
     `Tổng thu: ${formatCurrency(income)}`,
     `Tổng chi: ${formatCurrency(expense)}`,
     `Cân đối: ${formatCurrency(income - expense)}`,
@@ -186,12 +213,7 @@ function isValidDate(date, filter, now) {
     );
   }
   if (filter === "week") {
-    const dayOfWeek = now.getDay() || 7; // Chủ nhật là 7
-    const startOfWeek = new Date(now);
-    startOfWeek.setDate(now.getDate() - dayOfWeek + 1); // Ngày đầu tuần
-    const endOfWeek = new Date(startOfWeek);
-    endOfWeek.setDate(startOfWeek.getDate() + 6); // Ngày cuối tuần
-
+    const { startOfWeek, endOfWeek } = now;
     return date >= startOfWeek && date <= endOfWeek;
   }
   return true;
@@ -204,7 +226,13 @@ function parseDate(filter, dateParam) {
     return new Date(parts[1], parts[0] - 1);
   }
   if (filter === "week" && parts.length === 3) {
-    return new Date(parts[2], parts[1] - 1, parts[0]);
+    const date = new Date(parts[2], parts[1] - 1, parts[0]);
+    const dayOfWeek = date.getDay() || 7;
+    date.startOfWeek = new Date(date);
+    date.startOfWeek.setDate(date.getDate() - dayOfWeek + 1);
+    date.endOfWeek = new Date(date.startOfWeek);
+    date.endOfWeek.setDate(date.startOfWeek.getDate() + 6);
+    return date;
   }
   return new Date();
 }
@@ -259,6 +287,12 @@ Mở trình duyệt, truy cập:
  
 {"ok":true,"result":true,"description":"Webhook was set"}.
 
+***Reload lại trang 1 lần nữa***
+
+Lúc này sẽ hiển thị:
+
+{"ok":true,"result":true,"description":"Webhook is already set"}.
+
 ---
 
 ## V. Sử dụng bot
@@ -290,6 +324,18 @@ Ví dụ:
 **/report dd/mm/yyyy :** Báo cáo theo tuần có ngày đó
 
  ![](https://github.com/nguyenngocphung2000/Bot-QLCT-Telegram/blob/main/Rp_week.PNG)
+
+
+ **Thêm tính năng xắp xếp báo cáo:**
+
+ ***Cú pháp: thêm az hoặc za vào cuối câu lệnh***
+ *az là xắp xếp từ bé đến lớn, za là xắp xếp từ lớn đến bé*
+
+Ví dụ:
+
+/report 01/01/2025 az
+
+/report 01/2025 za
  
 **/undo**: Xóa giao dịch gần nhất.
  
